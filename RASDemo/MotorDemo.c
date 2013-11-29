@@ -3,11 +3,14 @@
 #include <RASLib/inc/common.h>
 #include <RASLib/inc/motor.h>
 
-tMotor *motors[2];
+tMotor* leftMotor;
+tMotor* rightMotor;
 
 void initMotors(void) {
-    motors[0] = InitializeMotor(PIN_B7, PIN_B6, true, false);
-    motors[1] = InitializeMotor(PIN_E5, PIN_E4, true, false);
+    leftMotor = InitializeMotor(PIN_F3, PIN_F2, true, false);
+    rightMotor = InitializeMotor(PIN_C5, PIN_C4, true, true);
+    SetMotor(leftMotor, 0.0f);
+    SetMotor(rightMotor, 0.0f);
 }
 
 void motorDemo(void) {
@@ -15,7 +18,7 @@ void motorDemo(void) {
     Printf("d-right\n  space-stop\n  enter-quit\n");
   
     {
-        float left = 0, right = 0, speed = 0.75;
+        float left = 0, right = 0, speed = 0.75, accel = .01;
         char newline = 13;
         char ch = Getc();
         while(ch != newline) {
@@ -38,19 +41,37 @@ void motorDemo(void) {
                     left = speed;
                     right = -speed;
                     break;
+                
+                case 'i':
+                    left += accel;
+                    right += accel;
+                    break;
+                case 'k':
+                    left += -accel;
+                    right += -accel;
+                    break;
+                case 'j':
+                    left += -accel;
+                    right += accel;
+                    break;
+                case 'l':
+                    left += accel;
+                    right += -accel;
+                    break;
+                
                 default:
                     left = 0; 
                     right = 0;
                     break;
             }
 
-            SetMotor(motors[0], left);
-            SetMotor(motors[1], right);
-            Printf(" Set Motor to %d %d  \r", (int)(left*100), (int)(right*100));
+            SetMotor(leftMotor, left);
+            SetMotor(rightMotor, right);
+            Printf(" Set Motor to %1.3f %1.3f  \r", left, right);
         }
     }                 
     
-    SetMotor(motors[0], 0.0f);
-    SetMotor(motors[1], 0.0f);
+    SetMotor(leftMotor, 0.0f);
+    SetMotor(rightMotor, 0.0f);
     Printf("\n");
 }
